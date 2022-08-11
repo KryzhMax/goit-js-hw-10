@@ -3,7 +3,7 @@ import { fetchCountries } from './fetchCountries/fetchCountries';
 import { refs } from './refs';
 import debounce from 'lodash.debounce';
 import { renderCountryList, renderCountry } from './markup';
-import { updateMarkup } from './service';
+import { updateMarkup, clearMarkup } from './service';
 import { onError, toNotify } from './notifications';
 
 const { inputRef } = refs;
@@ -16,7 +16,7 @@ const getCountry = country => {
       const render = data;
       console.log(render);
       if (render.length === 1) {
-        console.log(renderCountry(data));
+        // console.log(renderCountry(data));
         updateMarkup('', 'countryListRef');
         return updateMarkup(renderCountry(data), 'countryInfoRef');
       }
@@ -29,18 +29,19 @@ const getCountry = country => {
     })
     .catch(() => {
       onError();
-      updateMarkup();
+      updateMarkup('', 'countryInfoRef');
+      updateMarkup('', 'countryListRef');
     });
 };
 
 const onInputChange = debounce(event => {
   event.preventDefault();
+  clearMarkup();
   let value = event.target.value.trim();
   console.log(value);
   if (!value) {
     updateMarkup('', 'countryInfoRef');
     updateMarkup('', 'countryListRef');
-    return;
   }
   getCountry(value);
 }, DEBOUNCE_DELAY);
